@@ -15,13 +15,10 @@ class TestStringMethods(unittest.TestCase):
         rs = afn.convertir_posfija("((a|b|c)*|e+|r)+|a")
         self.assertEqual(rs,"ab|c|*e+|r|+a|")
 
-
-
     def test_convertir_posfija3(self):
         afn = AFN(None,None,None,None,None)
         rs = afn.convertir_posfija("(((a*|b*|c)*|c)*)+b")
         self.assertEqual(rs,"a*b*|c|*c|*+b.")
-
 
     def test_convertir_posfija4(self):
         afn = AFN(None,None,None,None,None)
@@ -43,12 +40,10 @@ class TestStringMethods(unittest.TestCase):
         rs = afn.convertir_posfija("(a|b)(ab)")
         self.assertEqual(rs,"ab|ab..")
 
-
     def test_convertir_posfija8(self):
         afn = AFN(None,None,None,None,None)
         rs = afn.convertir_posfija("abcd")
         self.assertEqual(rs,"ab.c.d.")
-
 
     def test_convertir_posfija9(self):
         afn = AFN(None,None,None,None,None)
@@ -60,15 +55,25 @@ class TestStringMethods(unittest.TestCase):
         rs = afn.convertir_posfija("a|b+c|d")
         self.assertEqual(rs,"ab+c.|d|")
 
-
     def test_proces_cadena1(self):
         afn = AFN(None,None,None,None,None)
         rs = afn.proces_cadena("(((a*|b*|c)*|c)*)+b")
         self.assertEqual(rs,"(((a*|b*|c)*|c)*)+.b")
 
+    def test_proces_cadena2(self):
+        afn = AFN(None,None,None,None,None)
+        rs = afn.proces_cadena("abc")
+        self.assertEqual(rs, "a.b.c")
 
+    def test_proces_cadena3(self):
+        afn = AFN(None,None,None,None,None)
+        rs = afn.proces_cadena("(a|b|c)(a|c)")
+        self.assertEqual(rs, "(a|b|c).(a|c)")
 
-
+    def test_proces_cadena4(self):
+        afn = AFN(None,None,None,None,None)
+        rs = afn.proces_cadena("(a|b|c)de")
+        self.assertEqual(rs, "(a|b|c).d.e")
 
 if __name__ == '__main__':
     unittest.main()

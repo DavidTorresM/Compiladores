@@ -64,7 +64,8 @@ class AFN(AF):
 		pass
 
 	def operar(self,operador,operandos):
-
+		pass
+		
 	def convertir(self, expresion_regular:str ):
 		er_pos = self.convertir_posfija(expresion_regular)
 		pila = []
@@ -72,7 +73,7 @@ class AFN(AF):
 			if re.match(r"[a-z0-9]$",car) != None: #operando
 				pila.append(car)
 			else:
-				if car == "*" or car == "+" or :#unario
+				if car == "*" or car == "+":#unario
 					operando = pila.pop()
 					rs = self.operar(car,(operando,))
 				else:#binario
