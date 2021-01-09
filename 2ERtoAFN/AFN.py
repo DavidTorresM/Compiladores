@@ -63,14 +63,41 @@ class AFN(AF):
 	def generar_cadena(self) -> str:
 		pass
 
+	def operar(self,operador,operandos):
 
 	def convertir(self, expresion_regular:str ):
-		pass
+		er_pos = self.convertir_posfija(expresion_regular)
+		pila = []
+		for car in er_pos:
+			if re.match(r"[a-z0-9]$",car) != None: #operando
+				pila.append(car)
+			else:
+				if car == "*" or car == "+" or :#unario
+					operando = pila.pop()
+					rs = self.operar(car,(operando,))
+				else:#binario
+					operando1 = pila.pop()
+					operando2 = pila.pop()
+					rs = self.operar(car,(operando2,operando1))
+				pila.append(rs)
 
+
+
+	def proces_cadena(self,cadena):
+		i = 0; j = 0
+		cadFinal = []
+		for i in range(1,len(cadena)):
+			cadFinal.append(cadena[j])
+			cadenita = cadena[j]+cadena[i]
+			if re.match(r"[a-z]{2}|[\*\+][a-z\(]|\)[a-z\(]",cadenita) != None: #concatenar
+				cadFinal.append(".")
+			j += 1
+		return "".join(cadFinal)+cadena[-1]
 	def convertir_posfija(self, cadena:str) -> str:
+		cadena = self.proces_cadena(cadena)
 		pila = []; postfija = []
 		for c in cadena:
-			print("Pila: ",pila)
+			#print("Pila: ",pila)
 			if c == "(":
 				pila.append(c)
 			else:
@@ -94,18 +121,15 @@ class AFN(AF):
 						else:
 							pila.append(c)
 							desapila = False
-
-
-
 		while(len(pila) > 0):
 			postfija.append(pila.pop())
 		return "".join(postfija)
 
 	def prioridad_dentro(self,caracter):
-		dic = {"*":3,"+":2,"|":1,"(":0}
+		dic = {"*":3,"+":2,".":2,"|":1,"(":0}
 		return dic[caracter]
 	def prioridad_fuera(self,caracter):
-		dic = {"*":4,"+":2,"|":1,"(":5}
+		dic = {"*":4,"+":2,".":2,"|":1,"(":5}
 		return dic[caracter]
 
 
