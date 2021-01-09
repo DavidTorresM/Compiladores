@@ -1,0 +1,24 @@
+
+
+Practica 1 compiladores. (Algoritmo 
+
+Descripcion practica:
+
+
+
+*Los autómatas se podrán almacenar en formato de archivo af. (ver Anexo.)
+*Las clases AFN y AFD deberán tener disponibles los siguientes métodos: (Nota: ninguno de los métodos usa la salida estándar.)
+cargar_desde(nombre:string)
+guardar_en(nombre:string)
+agregar_transicion(inicio:int, fin:int, simbolo:char)
+eliminar_transicion(inicio:int, fin:int, simbolo:char)
+obtener_inicial():int
+obtener_finales():vector<int>
+establecer_inicial(estado:int)
+establecer_final(estado:int)
+esAFN(): bool
+esAFD(): bool
+acepta(cadena:string): bool
+generar_cadena(): string
+
+
