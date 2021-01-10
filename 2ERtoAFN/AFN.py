@@ -63,15 +63,142 @@ class AFN(AF):
 	def generar_cadena(self) -> str:
 		pass
 
-	def operar(self,operador,operandos):
+
+
+	def agregar_transicion(self, inicio:int, fin:int, simbolo:str):
+		if self.Q == {} or self.Q == []  or self.Q == None:
+			self.Q = set()
+			self.Q.add(inicio); 
+			self.Q.add(fin);
+		else:
+			if not inicio in self.Q:
+				self.Q.add(inicio)
+			if not fin in self.Q:
+				self.Q.add(fin)
+		super().agregar_transicion(inicio,fin,simbolo)
+
+
+
+
+
+
+	def operar(self,operador,afns):
+		if operador == "*":
+			self.cerradura_kleen(afns[0])
+		elif operador == "+":
+			self.cerradura_positiva(afns[0])
+		elif operador == "|":
+			self.union(afns[0],afns[1])
+		elif operador == ".":
+			self.concatenar(afns[0],afns[1])
+
+	def cerradura_kleen(self, afn):
+		afn.agregar_transicion(afn.obtener_final,afn.obtener_inicial,'E')
+		siguiente1 = max(afn.Q) + 1
+		afn.agregar_transicion(afn.obtener_final,siguiente1,'E')
+		siguiente2 = max(afn.Q) + 1
+		afn.agregar_transicion(siguiente2,afn.obtener_inicial,'E')
+		afn.establecer_inicial(siguiente2)
+		afn.establecer_final(siguiente1)
+		afn.agregar_transicion(afn.obtener_inicial,afn.obtener_final,'E')
+
+
+	def cerradura_positiva(self, afn):
+		afn.agregar_transicion(afn.obtener_final,afn.obtener_inicial,'E')
+		siguiente1 = max(afn.Q) + 1
+		afn.agregar_transicion(afn.obtener_final,siguiente1,'E')
+		siguiente2 = max(afn.Q) + 1
+		afn.agregar_transicion(siguiente2,afn.obtener_inicial,'E')
+		afn.establecer_inicial(siguiente2)
+		afn.establecer_final(siguiente1)
+
+	def union(self, afn1, afn2):
 		pass
+
+	def juntar_edos(self, afn1, afn2):
+		#change keys 
+		qf = afn1.obtener_final()
+		qi = afn2.q0
+
+		for carac,Qdic in afn2.delta.items():
+			if qi in Qdic.keys():
+				diccionario = Qdic[qi].copy()
+				del Qdic[qi]
+				afn2.delta[carac][qf] = diccionario
+
+		for carac,Qdic in afn2.delta.items():
+			for Qik,Qfset in Qdic.items():
+				if qi in Qfset:
+					Qfset.remove(qi)
+					Qfset.add(qf)
 		
+
+
+	def concatenar(self, afn1, afn2):
+		#Sumamos un offset a la funcion de transicion del 
+		#automata 2
+		#cambiar q0 por qf
+		self.juntar_edos(afn1,afn2)
+		newDelta = self.map_delta(afn2.delta,offset = max(afn1.Q))
+		d1Final = self.unir_delta(afn1.delta,newDelta)
+		return d1Final
+
+	def unir_delta(self,d1,d2):
+		#Unir delta
+		s1 = set(d1.keys());s2 = set(d2.keys())
+		#Caracteres que hacen falta para copiarlos
+		addCars = s2.difference(s1)
+		for car in addCars:
+			d1[car] = d2[car].copy()
+		#caracteres que ya hay solo hay que agregarlos
+		intersecCars = s1 & s2
+		for car in intersecCars:
+			d1[car].update(d2[car])
+		return d1
+
+
+	def map_delta(self, delta, offset):
+		#copiar delta con un aumento en el offset
+		newDelta = {}
+		for Cak,Qdic in delta.items():
+			newDelta[Cak] = {}
+			for Qik, QfvSet in Qdic.items():
+				newDelta[Cak][Qik+offset] = set(map(lambda x: x+offset,QfvSet)) 
+		return newDelta
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	def create_afn(self, init, fin, caracter):
+		anf = AFN(None,None,None,None,None)
+		anf.agregar_transicion(init, fin, caracter)
+		anf.establecer_inicial(init)
+		anf.establecer_final(fin)
+		return anf
+
 	def convertir(self, expresion_regular:str ):
 		er_pos = self.convertir_posfija(expresion_regular)
 		pila = []
 		for car in er_pos:
 			if re.match(r"[a-z0-9]$",car) != None: #operando
-				pila.append(car)
+				pila.append(self.create_afn(1,2,car))
 			else:
 				if car == "*" or car == "+":#unario
 					operando = pila.pop()
@@ -81,8 +208,6 @@ class AFN(AF):
 					operando2 = pila.pop()
 					rs = self.operar(car,(operando2,operando1))
 				pila.append(rs)
-
-
 
 	def proces_cadena(self,cadena):
 		i = 0; j = 0
@@ -133,9 +258,6 @@ class AFN(AF):
 		dic = {"*":4,"+":2,".":2,"|":1,"(":5}
 		return dic[caracter]
 
-
-	def envaluar_posfija(self, cadena:str):
-		pass
 
 		
 
