@@ -115,60 +115,73 @@ class AFN(AF):
 	def union(self, afn1, afn2):
 		pass
 
-	def juntar_edos(self, afn1, afn2):
-		#change keys 
-		qf = afn1.obtener_final()
-		qi = afn2.q0
+	def sumar_offset_grafo(self, afn2, offset):
+		afn2.establecer_final(afn2.obtener_final() + offset)
+		afn2.establecer_inicial(afn2.obtener_inicial() + offset)
+		d2 = afn2.delta
+		delta = {}
+		for car, edosDic in d2.items():
+			delta[car] = {}
+			for Qi,setQf in edosDic.items():
+				setQf_process = set(map(lambda x:x+offset,setQf))
+				delta[car][Qi+offset] = setQf_process
+		afn2.delta = delta
 
-		for carac,Qdic in afn2.delta.items():
-			if qi in Qdic.keys():
-				diccionario = Qdic[qi].copy()
-				del Qdic[qi]
-				afn2.delta[carac][qf] = diccionario
+	def juntar_afns(self, afn1, afn2):
+		d1 = afn1.delta
+		d2 = afn2.delta
+		s1 = set(d1.keys())
+		s2 = set(d2.keys())
+		#Copiamos Los caracteres que faltan
+		caracteres_agregar = s2.difference(s1)
+		for caracter in caracteres_agregar:
+			d1[caracter] = d2[caracter].copy()
+		#Juntamos los caracteres ya repetidos
+		caracteres_juntar = s2.intersection(s1)
+		for caracter in caracteres_juntar:
+			Qi1 = set(d1[caracter].keys())
+			Qi2 = set(d2[caracter].keys())
+			interseccion = Qi1.intersection(Qi2)
+			if len(interseccion) != 0:#intersectan
+				for Qi in interseccion:
+					d1[caracter][Qi].update(d2[caracter][Qi])
+			else:#no interseccion
+				d1[caracter].update(d2[caracter])
 
-		for carac,Qdic in afn2.delta.items():
-			for Qik,Qfset in Qdic.items():
-				if qi in Qfset:
-					Qfset.remove(qi)
-					Qfset.add(qf)
-		
+	def cambiar_edos(self, afn ,val1, val2):
+		#Cambiar val1 por val2 de las tablas
+		delta = afn.delta
+		for car,dicQi in delta.items():
+			set_keys_qi = set(dicQi.keys())
+			if val1 in set_keys_qi: #Cuando esta en las keys
+				valores = delta[car][val1].copy()
+				del delta[car][val1]
+				if val2 in delta[car].keys():#unimos
+					delta[car][val2] |= valores
+				else:#creamos
+					delta[car][val2] = valores
+			else:#Cuando esta en los valores 
+				for qi,qfset in dicQi.items():
+					if val1 in qfset:
+						qfset.remove(val1)
+						qfset.add(val2)
+
+
 
 
 	def concatenar(self, afn1, afn2):
-		#Sumamos un offset a la funcion de transicion del 
-		#automata 2
-		#cambiar q0 por qf
-		self.juntar_edos(afn1,afn2)
-		newDelta = self.map_delta(afn2.delta,offset = max(afn1.Q))
-		d1Final = self.unir_delta(afn1.delta,newDelta)
-		return d1Final
-
-	def unir_delta(self,d1,d2):
-		#Unir delta
-		s1 = set(d1.keys());s2 = set(d2.keys())
-		#Caracteres que hacen falta para copiarlos
-		addCars = s2.difference(s1)
-		for car in addCars:
-			d1[car] = d2[car].copy()
-		#caracteres que ya hay solo hay que agregarlos
-		intersecCars = s1 & s2
-		for car in intersecCars:
-			d1[car].update(d2[car])
-		return d1
-
-
-	def map_delta(self, delta, offset):
-		#copiar delta con un aumento en el offset
-		newDelta = {}
-		for Cak,Qdic in delta.items():
-			newDelta[Cak] = {}
-			for Qik, QfvSet in Qdic.items():
-				newDelta[Cak][Qik+offset] = set(map(lambda x: x+offset,QfvSet)) 
-		return newDelta
-
-
-
-
+		##Sumar offset al afn2
+		self.sumar_offset_grafo(afn2, offset = max(afn1.Q))
+		##Juntar delta afn2 con afn1
+		self.juntar_afns(afn1, afn2)
+		##Hacer cambios en en las keys 
+		#El final de afn1 = inicial de afn2
+		fin_af1 = afn1.obtener_final()
+		ini_af2 = afn2.obtener_inicial()
+		print("cambiar: ", afn1.delta)
+		print("af1: ",fin_af1,"af2: ",ini_af2)
+		self.cambiar_edos(afn1,fin_af1,ini_af2)
+		print("despues cambiar: ", afn1.delta)
 
 
 
