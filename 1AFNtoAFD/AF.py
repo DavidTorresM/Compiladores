@@ -39,7 +39,10 @@ class AF(object):
 		super(AF, self).__init__()
 		self.Q = Q
 		self.q0 = q0
-		self.sigma = sigma
+		if sigma==None:
+			self.sigma = set()
+		else:
+			self.sigma = sigma
 		self.F = F
 		if delta==None:
 			self.delta = {}
@@ -61,6 +64,7 @@ class AF(object):
 		pass
 
 	def agregar_transicion(self, inicio:int, fin:int, simbolo:str):
+		self.sigma.add(simbolo)
 		if simbolo in self.delta.keys():
 			subtabla = self.delta[simbolo]
 			if inicio in subtabla.keys():
@@ -94,8 +98,7 @@ class AF(object):
 			for kQi,dicQf in dicQ.items():
 				if len(dicQf) >= 2:
 					return True
-		elipsons = list(filter(lambda x: x == 'E',self.sigma))
-		return len(elipsons) > 0
+		return 'E' in self.sigma
 
 	def esAFD(self) -> bool:
 		return not self.esAFN()

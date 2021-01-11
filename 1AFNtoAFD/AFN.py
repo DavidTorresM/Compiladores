@@ -5,9 +5,13 @@ class AFN(AF):
 	"""docstring for AFN"""
 	def __init__(self, Q, q0, sigma, F, delta ):
 		super(AFN, self).__init__(Q, q0, sigma, F, delta)
+		
 		self.Q = Q
 		self.q0 = q0
-		self.sigma = sigma
+		if sigma==None:
+			self.sigma = set()
+		else:
+			self.sigma = sigma
 		self.F = F
 		if delta==None:
 			self.delta = {}

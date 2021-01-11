@@ -7,7 +7,10 @@ class AFD(AF):
 		super(AFD, self).__init__(Q, q0, sigma, F, delta)
 		self.Q = Q
 		self.q0 = q0
-		self.sigma = sigma
+		if sigma==None:
+			self.sigma = set()
+		else:
+			self.sigma = sigma
 		self.F = F
 		if delta==None:
 			self.delta = {}
