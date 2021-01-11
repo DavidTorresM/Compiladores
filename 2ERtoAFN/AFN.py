@@ -85,35 +85,74 @@ class AFN(AF):
 	def operar(self,operador,afns):
 		if operador == "*":
 			self.cerradura_kleen(afns[0])
+			rs = afns[0]
 		elif operador == "+":
 			self.cerradura_positiva(afns[0])
+			rs = afns[0]
 		elif operador == "|":
 			self.union(afns[0],afns[1])
+			rs = afns[0]
 		elif operador == ".":
 			self.concatenar(afns[0],afns[1])
+			rs = afns[0]
+		return rs
+
+
+
 
 	def cerradura_kleen(self, afn):
-		afn.agregar_transicion(afn.obtener_final,afn.obtener_inicial,'E')
+		afn.agregar_transicion(afn.obtener_final(),afn.obtener_inicial(),'E')
 		siguiente1 = max(afn.Q) + 1
-		afn.agregar_transicion(afn.obtener_final,siguiente1,'E')
+		afn.agregar_transicion(afn.obtener_final(),siguiente1,'E')
 		siguiente2 = max(afn.Q) + 1
-		afn.agregar_transicion(siguiente2,afn.obtener_inicial,'E')
+		afn.agregar_transicion(siguiente2,afn.obtener_inicial(),'E')
 		afn.establecer_inicial(siguiente2)
 		afn.establecer_final(siguiente1)
-		afn.agregar_transicion(afn.obtener_inicial,afn.obtener_final,'E')
+		afn.agregar_transicion(afn.obtener_inicial(),afn.obtener_final(),'E')
 
 
 	def cerradura_positiva(self, afn):
-		afn.agregar_transicion(afn.obtener_final,afn.obtener_inicial,'E')
+		afn.agregar_transicion(afn.obtener_final(),afn.obtener_inicial(),'E')
 		siguiente1 = max(afn.Q) + 1
-		afn.agregar_transicion(afn.obtener_final,siguiente1,'E')
+		afn.agregar_transicion(afn.obtener_final(),siguiente1,'E')
 		siguiente2 = max(afn.Q) + 1
-		afn.agregar_transicion(siguiente2,afn.obtener_inicial,'E')
+		afn.agregar_transicion(siguiente2,afn.obtener_inicial(),'E')
 		afn.establecer_inicial(siguiente2)
 		afn.establecer_final(siguiente1)
 
+
+
+	"""Realiza la union de dos afn"""
 	def union(self, afn1, afn2):
-		pass
+		siguiente = max(afn1.Q)+1
+		afn1.agregar_transicion(afn1.obtener_final(),siguiente,'E')
+		afn1.establecer_final(siguiente)
+		#print("trnsicion 1",afn1.delta,"q0:",afn1.q0,"qf:",afn1.F[0])
+
+		siguiente = max(afn1.Q)+1
+		afn1.agregar_transicion(siguiente,afn1.obtener_inicial(),'E')
+		afn1.establecer_inicial(siguiente)
+		#print("trnsicion 2",afn1.delta,"q0:",afn1.q0,"qf:",afn1.F[0])
+
+
+		afn1.agregar_transicion(max(afn1.Q),max(afn1.Q)+1,'E')
+
+		fin_aux = afn1.obtener_final()
+		afn1.establecer_final(max(afn1.Q))
+		#print("sub trnsicion 2",afn1.delta,"q0:",afn1.q0,"qf:",afn1.F[0])
+
+		afn1.concatenar(afn1,afn2)
+
+		#print(afn1.delta)
+		#print("concat:",afn1.delta,"q0:",afn1.q0,"qf:",afn1.F[0])
+
+		afn1.agregar_transicion(afn1.obtener_final(), fin_aux, 'E')
+		afn1.establecer_final(fin_aux)
+
+
+		#print(afn1.delta)
+		#print("final:",afn1.delta,"q0:",afn1.q0,"qf:",afn1.F[0])
+
 
 	def sumar_offset_grafo(self, afn2, offset):
 		afn2.establecer_final(afn2.obtener_final() + offset)
@@ -178,26 +217,11 @@ class AFN(AF):
 		#El final de afn1 = inicial de afn2
 		fin_af1 = afn1.obtener_final()
 		ini_af2 = afn2.obtener_inicial()
-		print("cambiar: ", afn1.delta)
-		print("af1: ",fin_af1,"af2: ",ini_af2)
+		#print("cambiar: ", afn1.delta)
+		#print("af1: ",fin_af1,"af2: ",ini_af2)
 		self.cambiar_edos(afn1,fin_af1,ini_af2)
-		print("despues cambiar: ", afn1.delta)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		#print("despues cambiar: ", afn1.delta)
+		afn1.establecer_final(afn2.obtener_final())
 
 	def create_afn(self, init, fin, caracter):
 		anf = AFN(None,None,None,None,None)
@@ -221,6 +245,7 @@ class AFN(AF):
 					operando2 = pila.pop()
 					rs = self.operar(car,(operando2,operando1))
 				pila.append(rs)
+		return pila.pop()
 
 	def proces_cadena(self,cadena):
 		i = 0; j = 0
@@ -236,7 +261,7 @@ class AFN(AF):
 		cadena = self.proces_cadena(cadena)
 		pila = []; postfija = []
 		for c in cadena:
-			#print("Pila: ",pila)
+			##print("Pila: ",pila)
 			if c == "(":
 				pila.append(c)
 			else:
