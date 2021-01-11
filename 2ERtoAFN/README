@@ -1,0 +1,6 @@
+#Diseño y desarrollo de un sistema para obtener el AFN asociado a una Expresión Regular por construcción de Thompson.
+
+
+
+
+Utilizando los principios de la programación Orientada a Objetos, diseñar y desarrollar la clase Thomson conel método: •convertir(expresión_regular:string): AFNEste métodorecibe una expresión regularen formatode cadena, con las siguientes características:•Símbolos de la ‘a’a la ‘z ‘,en minúsculas, vocales sin acentos y sin la ñ.•Letra E representa épsilon.•Losoperadoresexplícitos son: +, *, |•La concatenación está implícita: ab•Los paréntesis son agrupadores: ()•Longitud máxima de la cadena: 1000 caracteres.El objeto de salida será de la clase AFN programada en la práctica 1. Se deberá utilizar el algoritmo de McNaughton-YamadaThompsonvisto en clase.
