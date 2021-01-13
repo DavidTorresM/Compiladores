@@ -37,26 +37,35 @@ class Subconjuntos(object):
 
 
 	def convertir(self, afn: AFN) -> AFD:
-		afd = AFD(None,None,None,None,None)
+		alfabeto = [i for i in afn.sigma if i!='E']
 		A = self.cerradura({afn.obtener_inicial()})
-		alfabeto = afn.sigma
+		edos_faltante = [A]; edos_final = [A]; transiciones = []
 
-		sets_generados = {A}; sets_generados_aux = {A}
-		transiciones = []
+		while len(edos_faltante) > 0:
+			edo_i = edos_faltante.pop()
+			for caracter in alfabeto:
+				edo_next = self.mover(edo_i,caracter)
+				edo_next = self.cerradura(edo_next)
+				if len(edo_next) > 0:
+					transiciones.append((edo_i,caracter,edo_next))
+					if edo_next not in edos_final:
+						edos_faltante.append(edo_next)
+						edos_final.append(edo_next)
 
-		while len(sets_generados) != 0:
-			set_i = list(sets_generados)[0]
-			sets_generados_aux.add(set_i)
-			for car in alfabeto:
-				set_nuevo = self.cerradura(self.mover(set_i,car))
-				if len(set_nuevo) != 0:
-					sets_generados.add(set_nuevo)
-					transiciones.append((set_i,set_nuevo.copy(),caracter))#(origen,destino,caracter)
-			sets_generados.remove(set_i)
+		#sacar los finales 
+		finales = afn.obtener_finales()
+		afd = AFD(None,None,None,None,None)
 
-		sets_generados = list(sets_generados)
-		for origen_s, destino_s, caracter in transiciones:
-			afd.agregar_transicion(sets_generados.index(origen_s)+1,sets_generados.index(destino_s)+1,caracter)
-		#Faltan los finales
+		for edo_i_set, caracter, edo_f_set in transiciones:
+			afd.agregar_transicion(edos_final.index(edo_i_set)+1,edos_final.index(edo_f_set)+1,caracter)
+
+		edos_finales = []
+		for edo_i in edos_final:
+			for final in finales:
+				if final in edo_i:
+					edos_finales.append(edos_final.index(edo_i)+1)
+		afd.establecer_finales(edos_finales)
 
 		return afd
+
+
