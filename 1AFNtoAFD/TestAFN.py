@@ -27,9 +27,17 @@ class TestStringMethods(unittest.TestCase):
     def test_acepta_aux1(self):
         afn = AFN(None,None,None,None,None)
         afn.cargar_desde("test4.txt")
-        self.assertEqual(afn.acepta("abababbba"),True)
+        self.assertEqual(afn.acepta("abababbba"),False)
 
+    def test_acepta_aux2(self):
+        afn = AFN(None,None,None,None,None)
+        afn.cargar_desde("test4.txt")
+        self.assertEqual(afn.acepta("aab"),False)
 
+    def test_acepta_aux3(self):
+        afn = AFN(None,None,None,None,None)
+        afn.cargar_desde("test4.txt")
+        self.assertEqual(afn.acepta("abba"),False)
 
     
 

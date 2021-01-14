@@ -1,9 +1,11 @@
 D           [0-9]
+DO          [0-7]
 L           [a-zA-Z_]
 H           [a-fA-F0-9]
 E           [Ee][+-]?{D}+
 FS          (f|F|l|L)
 IS          (u|U|l|L)*
+SIG         (+|-)
 
 %{
 #include <stdio.h>
@@ -49,9 +51,9 @@ void count();
 
 {L}({L}|{D})*       { printf("<Identificador>"); }
 0[xX]{H}+{IS}?      { printf("<Constante-Entera>"); }
-0{D}+{IS}?      	{ printf("<Constante-Entera-OCTAL>"); }
+0{DO}+{IS}?      	{ printf("<Constante-Entera-OCTAL>"); }
 {D}+{IS}?       	{ printf("<Constante-Entera-DECIMAL>"); }
-L?'(\\.|[^\\'])+'   { printf("<Constante-Cadena>");}
+L?\"(\\.|[^\\"])*\"   { printf("<Constante-Cadena>");}
 
 {D}+{E}{FS}?        { printf("<Constante-Flotante>"); }
 {D}*"."{D}+({E})?{FS}?  { printf("<Constante-Flotante>"); }
@@ -98,8 +100,8 @@ L?'(\\.|[^\\'])+'   { printf("<Constante-Cadena>");}
 "="         { printf("<Operador-ASIGNACION>"); }
 "("         { printf("<Operador-CAST>"); }
 ")"         { printf("<Operador-CAST>"); }
-("["|"<:")  { printf("<span class='text-secondary'>[</span>"); }
-("]"|":>")  { printf("<span class='text-secondary'>]</span>"); }
+("["|"<:")  { printf("<Operador [>"); }
+("]"|":>")  { printf("<Operador ]>"); }
 "."         { printf("<Operador-ESTRUCTURA>"); }
 "&"         { printf("<Operador-BITS>"); }
 "!"         { printf("<Operador-LOGICO>"); }

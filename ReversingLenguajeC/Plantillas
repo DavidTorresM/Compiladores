@@ -1,0 +1,18 @@
+Suma 
+
+Resta
+
+Multiplicacion
+
+Divicion
+
+Corrimientos
+
+
+if 
+
+    1142:	3b 45 fc             	cmp    -0x4(%rbp),%eax
+    1145:	7d 07                	jge    114e <funcion+0x25>
+    1147:	b8 01 00 00 00       	mov    $0x1,%eax
+    114c:	eb 05                	jmp    1153 <funcion+0x2a>
+    114e:	b8 00 00 00 00       	mov    $0x0,%eax
