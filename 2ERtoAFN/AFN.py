@@ -11,7 +11,10 @@ class AFN(AF):
 		super(AFN, self).__init__(Q, q0, sigma, F, delta)
 		self.Q = Q
 		self.q0 = q0
-		self.sigma = sigma
+		if sigma==None:
+			self.sigma = set()
+		else:
+			self.sigma = sigma
 		self.F = F
 		if delta==None:
 			self.delta = {}
@@ -42,22 +45,28 @@ class AFN(AF):
 
 
 		
+	def siguiente_estado(self,edo_actual, entrada):
+		if entrada in self.delta.keys():
+			edos_dic = self.delta[entrada]
+			return edos_dic[edo_actual] if edo_actual in edos_dic.keys() else set()
+		return {}
 	def acepta(self, cadena:str) -> bool:
 		return self.acepta_aux(cadena, self.q0)
 
 	def acepta_aux(self, cadena, edo):
-		if len(cadena)==0:
-			return edo in self.F
-		c = cadena[0]
-		if c in self.delta.keys():
-			if edo in self.delta[c].keys():
-				results = [self.acepta_aux(cadena[1:],siguiente) 
-				for siguiente in self.delta[c][edo]]
-				return functools.reduce(lambda x,y: x or y,results)
-			else:
-				return False
-		else:
-			return False
+		if len(cadena) == 0:
+			return edo in self.obtener_finales()
+		caracter = cadena[0]
+		acepto_caracter = False
+		acepto_elipson = False
+		next_edo = self.siguiente_estado(edo, caracter)
+		for edo_i in next_edo:
+			acepto_caracter = self.acepta_aux( cadena[1:], edo_i )
+		next_edo = self.siguiente_estado(edo, "E")
+		for edo_i in next_edo:
+			acepto_elipson  = self.acepta_aux( cadena, edo_i )
+		return acepto_caracter or acepto_elipson
+			
 
 
 	def generar_cadena(self) -> str:

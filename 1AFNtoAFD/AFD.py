@@ -5,17 +5,6 @@ class AFD(AF):
 	"""docstring for AFN"""
 	def __init__(self, Q, q0, sigma, F, delta ):
 		super(AFD, self).__init__(Q, q0, sigma, F, delta)
-		self.Q = Q
-		self.q0 = q0
-		if sigma==None:
-			self.sigma = set()
-		else:
-			self.sigma = sigma
-		self.F = F
-		if delta==None:
-			self.delta = {}
-		else:
-			self.delta = delta
 	def cargar_desde(self, nombre:str):
 		loader = ParserData()
 		(q0, F, tra) = loader.load_data_source(nombre)

@@ -41,23 +41,31 @@ class AFN(AF):
 						f.write("{}->{},{}\n".format(kQi,kQf,kCar))
 
 
-		
+	def siguiente_estado(self,edo_actual, entrada):
+		if entrada in self.delta.keys():
+			edos_dic = self.delta[entrada]
+			return edos_dic[edo_actual] if edo_actual in edos_dic.keys() else set()
+		return {}
 	def acepta(self, cadena:str) -> bool:
 		return self.acepta_aux(cadena, self.q0)
 
 	def acepta_aux(self, cadena, edo):
-		if len(cadena)==0:
-			return edo in self.F
-		c = cadena[0]
-		if c in self.delta.keys():
-			if edo in self.delta[c].keys():
-				results = [self.acepta_aux(cadena[1:],siguiente) 
-				for siguiente in self.delta[c][edo]]
-				return functools.reduce(lambda x,y: x or y,results)
+		if len(cadena) == 0:
+			next_edos = self.siguiente_estado(edo, "E")
+			if len(next_edos) == 0:
+				return edo in self.obtener_finales()
 			else:
-				return False
-		else:
-			return False
+				ac_elipson  = [self.acepta_aux( cadena, edo_i ) for edo_i in next_edos]
+				return True in ac_elipson
+		
+		caracter = cadena[0]
+		next_edos = self.siguiente_estado(edo, caracter)
+		ac_caracter = [self.acepta_aux( cadena[1:], edo_i ) for edo_i in next_edos]
+		next_edos = self.siguiente_estado(edo, "E")
+		ac_elipson  = [self.acepta_aux( cadena, edo_i ) for edo_i in next_edos]
+		
+		return True in ac_caracter or True in ac_elipson
+			
 
 
 	def generar_cadena(self) -> str:

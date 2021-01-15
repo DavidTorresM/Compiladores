@@ -40,6 +40,10 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(afn.acepta("abba"),False)
 
     
+    def test_acepta_aux4(self):
+        afn = AFN(None,None,None,None,None)
+        afn.cargar_desde("testAFN.txt")
+        self.assertEqual(afn.acepta("a"),True)
 
 
 

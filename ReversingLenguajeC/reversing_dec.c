@@ -1,13 +1,6 @@
 #include <stdio.h>
 
-int funcion(){
-    
-    float a = 34E-23;
-    
-    while(a--){
-        printf("hola");
-    }
-}
+
 
 int main(void){
 
@@ -15,8 +8,15 @@ int main(void){
     int y = 15;
     long z = 15;
 
-    z = funcion();
 
+
+	x = *x;
+
+	int *a 
+
+	sizeof +(short)a;
+
+	printf("%d\n",x);
     return 0;
 }
 

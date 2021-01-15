@@ -412,6 +412,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(automata.delta, dic)
         self.assertEqual(automata.obtener_inicial(), q0)
         self.assertEqual(automata.obtener_final(), qf)
+        self.assertEqual(automata.acepta("a"), True)
 
     def test_convertir2(self):
         afn = AFN(None,None,None,None,None)
